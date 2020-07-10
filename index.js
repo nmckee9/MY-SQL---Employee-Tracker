@@ -4,6 +4,7 @@ const connection = require("./connection")
 
 
 
+
 //function init
 
 function init() {
@@ -83,17 +84,17 @@ async function addDepartment() {
             message: "Add the Department Name",
         }
     )
-    .then(function (answer) {
-        connection.query("INSERT INTO department SET ?",
-        {
-          name: answer.department,
-        },
-        function (err) {
-            if (err) throw err;
-        });
+        .then(function (answer) {
+            connection.query("INSERT INTO department SET ?",
+                {
+                    name: answer.department,
+                },
+                function (err) {
+                    if (err) throw err;
+                });
 
-        init();
-    })
+            init();
+        })
 };
 
 function addRole() {
@@ -101,7 +102,7 @@ function addRole() {
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         res.map(department => departmentsArray.push(department.name + " " + department.id))
-        const questions = inquirer.prompt ([
+        const questions = inquirer.prompt([
             {
                 name: "department_id",
                 type: "list",
@@ -119,21 +120,21 @@ function addRole() {
                 message: "what is the role's salary?",
             },
         ])
-        .then(function (answer) {
-            connection.query("INSERT INTO department SET ?",
-            {
-                department_id: response.department_id,
-                title: response.title,
-                salary: response.salary
-            },
-            function (err) {
-                if (err) throw err;
-            });
+            .then(function (answer) {
+                connection.query("INSERT INTO department SET ?",
+                    {
+                        department_id: response.department_id,
+                        title: response.title,
+                        salary: response.salary
+                    },
+                    function (err) {
+                        if (err) throw err;
+                    });
 
-            init();
-        })
+                init();
+            })
 
-})
+    })
 };
 
 async function addEmployee() {
@@ -150,7 +151,7 @@ async function addEmployee() {
 
     const questions = await inquirer.prompt([
         {
-            
+
             name: "employee_first",
             type: "input",
             message: "What is the employees first name"
@@ -177,22 +178,65 @@ async function addEmployee() {
     ])
         .then(function (answer) {
             connection.query("INSERT INTO employee SET ?",
-            {
-                first_name: answer.employee_first,
-                last_name: answer.employee_last,
-                role_id: answer.role_id,
-                manager_id: answer.manager_id,
-            },
-            function (err) {
-                if (err) throw err;
-            });
+                {
+                    first_name: answer.employee_first,
+                    last_name: answer.employee_last,
+                    role_id: answer.role_id,
+                    manager_id: answer.manager_id,
+                },
+                function (err) {
+                    if (err) throw err;
+                });
 
             init();
         })
 };
 
-function updateEmployee() {
-
+async function updateEmployee() {
+    const employees = async () => await connection.query("SELECT * FROM employees");
+    const employeesArray = employees.map(employee => ({
+        value: id,
+        name: employee.first_name + " " + employee.last_name
+    }))
+    inquirer.prompt ([
+        {
+    
+            name: "updateEmployee",
+            type: "list",
+            message: "Select employee to update their role",
+            choices: employeesArray
+    
+        }]).then( async (answer) => {
+            try { 
+                 const roles = await dbQuery("SELECT title, id FROM roles");
+            } catch (err){
+                throw new Error(err)
+            }
+                 const roleChoices = roles.map(role => ({
+                     name: role.title,
+                     value: role.id
+                 }));
+                 inquirer.prompt([
+                    {
+                        name: "updateRole",
+                        type: "list",
+                        message: "Which role does this employee have?",
+                        choices: rolesArray
+                
+                    }]
+                 ).then(
+                    async roleAnswer => {
+                        try{
+                         const response = await dbQuery("UPDATE employees SET role_id = ? WHERE id = ?", [
+                            roleAnswer.updateRole, answer.updateEmployee
+                         ])} catch (err){
+                             throw new Error(err)
+                         }
+                         console.log(response)
+                         init()
+                     }
+                 )
+        })
 }
 
 init()
