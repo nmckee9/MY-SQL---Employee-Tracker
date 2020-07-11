@@ -20,7 +20,8 @@ function init() {
                 "Add Employee",
                 "Add Department",
                 "Add Roles",
-                "Update Existing Employee Role"
+                "Update Existing Employee Role",
+                "exit"
             ]
         })
         .then(function (answer) {
@@ -193,25 +194,23 @@ async function addEmployee() {
 };
 
 async function updateEmployee() {
-    const employees = async () => await connection.query("SELECT * FROM employees");
+    const employees = await connection.dbQuery("SELECT * FROM employee");
     const employeesArray = employees.map(employee => ({
-        value: id,
+        value: employee.id,
         name: employee.first_name + " " + employee.last_name
     }))
+
     inquirer.prompt ([
         {
-    
+
             name: "updateEmployee",
             type: "list",
             message: "Select employee to update their role",
             choices: employeesArray
     
-        }]).then( async (answer) => {
-            try { 
-                 const roles = await dbQuery("SELECT title, id FROM roles");
-            } catch (err){
-                throw new Error(err)
-            }
+        }]).then( async (answer) => { 
+                 const roles = await connection.dbQuery("SELECT title, id FROM roles");
+            
                  const roleChoices = roles.map(role => ({
                      name: role.title,
                      value: role.id
@@ -221,17 +220,15 @@ async function updateEmployee() {
                         name: "updateRole",
                         type: "list",
                         message: "Which role does this employee have?",
-                        choices: rolesArray
+                        choices: roleChoices
                 
                     }]
                  ).then(
                     async roleAnswer => {
-                        try{
-                         const response = await dbQuery("UPDATE employees SET role_id = ? WHERE id = ?", [
+                        
+                         const response = await connection.dbQuery("UPDATE employee SET role_id = ? WHERE id = ?", [
                             roleAnswer.updateRole, answer.updateEmployee
-                         ])} catch (err){
-                             throw new Error(err)
-                         }
+                         ])
                          console.log(response)
                          init()
                      }
