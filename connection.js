@@ -17,6 +17,6 @@ const connection = mysql.createConnection({
 
   connection.connect();
 
-  connection.query = util.promisify(connection.query)
+  connection.dbQuery = util.promisify(connection.query).bind(connection)
 
   module.exports = connection;

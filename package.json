@@ -1,11 +1,10 @@
 {
-  "name": "MY-SQL---Employee-Tracker",
+  "name": "mysql-employee-tracker",
   "version": "1.0.0",
   "description": "Architect and build a solution for managing a company's employees using node, inquirer, and MySQL",
   "main": "Employee_Tracker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-    
   },
   "repository": {
     "type": "git",
